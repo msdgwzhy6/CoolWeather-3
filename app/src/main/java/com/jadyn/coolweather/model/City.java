@@ -11,6 +11,14 @@ public class City {
     private String cityName;
     private String cityCode;
     private int provinceID;
+    private int id;
+
+    public City(String cityName, String cityCode, int provinceID, int id) {
+        this.cityName = cityName;
+        this.cityCode = cityCode;
+        this.provinceID = provinceID;
+        this.id = id;
+    }
 
     public void setCityName(String provinceName) {
         this.cityName = cityName;
@@ -36,5 +44,13 @@ public class City {
 
     public void setProvinceID(int provinceID) {
         this.provinceID = provinceID;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

@@ -1,8 +1,6 @@
 package com.jadyn.coolweather.model;
 
-/**
- * Created by JadynAi on 2016/2/26.
- */
+
 public class Province {
     /**
      * 封装省的数据类
@@ -11,6 +9,12 @@ public class Province {
     private String provinceName;
     private String provinceCode;
     private int id;
+
+    public Province(String provinceName, String provinceCode, int id) {
+        this.provinceName = provinceName;
+        this.provinceCode = provinceCode;
+        this.id = id;
+    }
 
     public void setProvinceName(String provinceName) {
         this.provinceName = provinceName;
