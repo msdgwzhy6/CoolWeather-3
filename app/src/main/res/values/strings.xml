@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">冷风天气</string>
+    <string name="province_sq">create table if not exists Province(
+		 _id integer primary key autoincrement, 
+		 province_name text not null,
+		 province_code text not null,) </string>
+    <string name="city_sq">create table if not exists City(
+		 _id integer primary key autoincrement, 
+		 city_name text not null,
+		 city_code text not null,
+        province_id integer not null,
+        ) </string>
+    <string name="country_sq">create table if not exists Country(
+		 _id integer primary key autoincrement, 
+		 country_name text not null,
+		 country_code text not null,
+        city_id integer not null,
+        ) </string>
+</resources>
