@@ -9,12 +9,7 @@ public class Province {
     private String provinceName;
     private String provinceCode;
     private int id;
-
-    public Province(String provinceName, String provinceCode, int id) {
-        this.provinceName = provinceName;
-        this.provinceCode = provinceCode;
-        this.id = id;
-    }
+    
 
     public void setProvinceName(String provinceName) {
         this.provinceName = provinceName;

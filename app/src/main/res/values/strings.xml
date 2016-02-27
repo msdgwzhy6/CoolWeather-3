@@ -1,19 +1,23 @@
 <resources>
-    <string name="app_name">冷风天气</string>
+    <string name="app_name">通通天气</string>
+
+	<!--建表语句-->
     <string name="province_sq">create table if not exists Province(
 		 _id integer primary key autoincrement, 
 		 province_name text not null,
-		 province_code text not null,) </string>
+		 province_code text not null) </string>
     <string name="city_sq">create table if not exists City(
 		 _id integer primary key autoincrement, 
 		 city_name text not null,
 		 city_code text not null,
-        province_id integer not null,
-        ) </string>
+        province_id integer not null) </string>
     <string name="country_sq">create table if not exists Country(
 		 _id integer primary key autoincrement, 
 		 country_name text not null,
 		 country_code text not null,
-        city_id integer not null,
-        ) </string>
+        city_id integer not null) </string>
+
+	<!--天气接口-->
+	<string name="address_total">http://www.weather.com.cn/data/list3/city.xml</string>
+	<string name="address">http://www.weather.com.cn/data/list3/city</string>
 </resources>

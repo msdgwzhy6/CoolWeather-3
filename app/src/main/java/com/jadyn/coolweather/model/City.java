@@ -13,12 +13,7 @@ public class City {
     private int provinceID;
     private int id;
 
-    public City(String cityName, String cityCode, int provinceID, int id) {
-        this.cityName = cityName;
-        this.cityCode = cityCode;
-        this.provinceID = provinceID;
-        this.id = id;
-    }
+   
 
     public void setCityName(String provinceName) {
         this.cityName = cityName;

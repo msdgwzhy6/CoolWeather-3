@@ -63,12 +63,14 @@ public class CoolWeaDB {
         Cursor cursor = db.query(PROVINCE, null, null, null, null, null, null);
 
         while (cursor.moveToNext()) {
-
+            Province province = new Province();
             int id = cursor.getInt(cursor.getColumnIndex("_id"));
+            province.setId(id);
             String name = cursor.getString(cursor.getColumnIndex("province_name"));
+            province.setProvinceName(name);
             String code = cursor.getString(cursor.getColumnIndex("province_code"));
+            province.setProvinceCode(code);
 
-            Province province = new Province(name, code, id);
             list.add(province);
         }
         
@@ -103,12 +105,15 @@ public class CoolWeaDB {
                 new String[]{String.valueOf(provinceID)}, null, null, null);
 
         while (cursor.moveToNext()) {
-
+            City city = new City();
+            city.setProvinceID(provinceID);
             int id = cursor.getInt(cursor.getColumnIndex("_id"));
+            city.setId(id);
             String name = cursor.getString(cursor.getColumnIndex("city_name"));
+            city.setCityName(name);
             String code = cursor.getString(cursor.getColumnIndex("city_code"));
+            city.setCityCode(code);
 
-            City city = new City(name, code, provinceID, id);
             list.add(city);
         }
         
