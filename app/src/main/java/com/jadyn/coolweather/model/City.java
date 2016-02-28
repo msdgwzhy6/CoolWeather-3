@@ -5,31 +5,15 @@ package com.jadyn.coolweather.model;
  */
 public class City {
     /**
-     * 封装省的数据类
+     * 封装市的数据类
      */
 
-    private String cityName;
-    private String cityCode;
-    private int provinceID;
-    private int id;
-
-   
-
-    public void setCityName(String provinceName) {
-        this.cityName = cityName;
-    }
-
-    public void setCityCode(String provinceCode) {
-        this.cityCode = cityCode;
-    }
-
+    public String cityName;
+    public int provinceID;//所属省的编号
+    public int id;
 
     public String getCityName() {
         return cityName;
-    }
-
-    public String getCityCode() {
-        return cityCode;
     }
 
 

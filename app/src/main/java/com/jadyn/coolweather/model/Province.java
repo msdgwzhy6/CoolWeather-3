@@ -6,32 +6,25 @@ public class Province {
      * 封装省的数据类
      */
 
-    private String provinceName;
-    private String provinceCode;
-    private int id;
+    public String provinceName;
+    public int ProID;
     
 
     public void setProvinceName(String provinceName) {
         this.provinceName = provinceName;
     }
 
-    public void setProvinceCode(String provinceCode) {
-        this.provinceCode = provinceCode;
-    }
 
     public void setId(int id) {
-        this.id = id;
+        this.ProID = id;
     }
 
     public String getProvinceName() {
         return provinceName;
     }
 
-    public String getProvinceCode() {
-        return provinceCode;
-    }
 
     public int getId() {
-        return id;
+        return ProID;
     }
 }

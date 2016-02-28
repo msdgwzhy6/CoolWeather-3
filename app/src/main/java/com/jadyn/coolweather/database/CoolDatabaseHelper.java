@@ -23,7 +23,7 @@ public class CoolDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CoolApplication.getContext().getResources().getString(R.string.province_sq));
         db.execSQL(CoolApplication.getContext().getResources().getString(R.string.city_sq));
         db.execSQL(CoolApplication.getContext().getResources().getString(R.string.country_sq));
-        CoolLog.d("CoolDatabaseHelper","表格创建成功");
+        CoolLog.d("CoolDatabaseHelper","数据库创建成功");
         
     }
 

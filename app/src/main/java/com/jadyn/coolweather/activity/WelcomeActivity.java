@@ -16,19 +16,7 @@ import butterknife.OnClick;
 public class WelcomeActivity extends AppCompatActivity {
 
 
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-
-        }
-    };
     
-    Runnable runnable=new Runnable() {
-        @Override
-        public void run() {
-            startActivity(new Intent(WelcomeActivity.this,ChooseAreaActivity.class));
-        }
-    };
     @Bind(R.id.welcome_image)
     ImageView welcomeImage;
 
@@ -38,10 +26,24 @@ public class WelcomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_welcome);
         ButterKnife.bind(this);
 
-        handler.postDelayed(runnable, 3500);
+        new SwitchHandler().sendEmptyMessageDelayed(1, 3500);//发送一个空消息
     }
 
     @OnClick(R.id.welcome_image)
     public void onClick() {
+        welcomeImage.setImageResource(R.mipmap.welcome);
     }
+
+    class SwitchHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Intent intent = new Intent(WelcomeActivity.this, ChooseAreaActivity.class);
+            WelcomeActivity.this.startActivity(intent);
+            //欢迎界面动画效果，淡入淡出
+            overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);
+            WelcomeActivity.this.finish();
+        }
+    }
+    
 }

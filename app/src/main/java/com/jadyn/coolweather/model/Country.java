@@ -7,7 +7,6 @@ public class Country {
 
     public int cityID;
     public String countryName;
-    public String countryCode;
     public int id;
     
 }
