@@ -1,6 +1,7 @@
 package com.jadyn.coolweather.activity;
 
-import android.app.ProgressDialog;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -46,9 +47,6 @@ public class ChooseAreaActivity extends BaseActivity {
     @Bind(R.id.choose_list)
     ListView chooseList;//列表
 
-    private ProgressDialog dialog;//进度对话框
-
-    
     /*
     * =========数据库相关=========
     * */
@@ -169,9 +167,6 @@ public class ChooseAreaActivity extends BaseActivity {
 
         popupWindow.setAnimationStyle(android.R.anim.slide_in_left);
         
-        ///这些为了点击非PopupWindow区域，PopupWindow会消失的，如果没有下面的
-        //代码的话，你会发现，当你把PopupWindow显示出来了，无论你按多少次后退键
-        //PopupWindow并不会关闭，而且退不出程序，加上下述代码可以解决这个问题
         popupWindow.setTouchable(true);
         popupWindow.setTouchInterceptor(new View.OnTouchListener() {
             @Override
@@ -202,9 +197,8 @@ public class ChooseAreaActivity extends BaseActivity {
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 String cityName = cities.get(groupPosition).cityName;
                 chooseTitle.setText(cityName);
-                Intent intent = new Intent(ChooseAreaActivity.this, MainActivity.class);
-                intent.putExtra(CITY_NAME, cityName);
-                startActivity(intent);
+                //打开对话框，是否继续向下查看
+                showAlertDialog(cityName);
                 return false;
             }
         });
@@ -212,14 +206,20 @@ public class ChooseAreaActivity extends BaseActivity {
         expand.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                chooseTitle.setText(countriesExpand.get(groupPosition).get(childPosition).countryName);
+                String countryName = countriesExpand.get(groupPosition).get(childPosition).countryName;
+                chooseTitle.setText(countryName);
                 popupWindow.dismiss();
+                
+                Intent intent = new Intent(ChooseAreaActivity.this, MainActivity.class);
+                intent.putExtra(CITY_NAME, countryName);
+                startActivity(intent);
                 return false;
             }
         });
         
         
     }
+
 
     //折叠列表初始化
     private void initExpandData(int ProID, ExpandableListView expandableListView) {
@@ -257,22 +257,23 @@ public class ChooseAreaActivity extends BaseActivity {
         return countries;
     }
 
+    private void showAlertDialog(final String cityName) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("是否查看此城市天气");
+        builder.setMessage("小主是要查看此城市天气，还是继续巡游此城?");
+        builder.setPositiveButton("看此城", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(ChooseAreaActivity.this, MainActivity.class);
+                intent.putExtra(CITY_NAME, cityName);
+                startActivity(intent);
+                popupWindow.dismiss();
+            }
+        });
 
-    //打开进度条对话框
-    private void showProgressDialog() {
-        if (dialog == null) {
-            dialog = new ProgressDialog(this, 0);
-            dialog.setMessage("正在努力加载中……");
-            dialog.setCanceledOnTouchOutside(false);
-        }
-        dialog.show();
+        builder.setNegativeButton("继续看看", null);
+        builder.show();
     }
-
-    //关闭进度条对话框
-    private void closeProgressDialog() {
-        if (dialog != null) {
-            dialog.dismiss();
-        }
-    }
+   
 
 }

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">通通天气</string>
 
-	<!--建表语句-->
+    <!--建表语句-->
     <string name="province_sq">create table if not exists T_Province(
 		 _id integer primary key autoincrement, 
 		 province_name text not null,
@@ -17,8 +17,7 @@
 		 country_code text not null,
         city_id integer not null) </string>
 
-	<!--天气接口-->
-	<string name="address_total">http://www.weather.com.cn/data/list3/city.xml</string>
-	<string name="address">http://www.weather.com.cn/data/list3/city</string>
-	<string name="weather_url">http://wthrcdn.etouch.cn/weather_mini?city</string>
+    <!--天气接口-->
+    <string name="weather_url">http://wthrcdn.etouch.cn/weather_mini?city</string>
+
 </resources>
