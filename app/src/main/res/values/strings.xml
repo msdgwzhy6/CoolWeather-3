@@ -20,4 +20,5 @@
 	<!--天气接口-->
 	<string name="address_total">http://www.weather.com.cn/data/list3/city.xml</string>
 	<string name="address">http://www.weather.com.cn/data/list3/city</string>
+	<string name="weather_url">http://wthrcdn.etouch.cn/weather_mini?city</string>
 </resources>
