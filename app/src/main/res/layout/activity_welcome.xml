@@ -9,6 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/welcome_image"
-        android:background="@drawable/welcome_pager"
+        android:background="@drawable/weclome_pencel"
         />
 </FrameLayout>

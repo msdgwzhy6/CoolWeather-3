@@ -9,7 +9,7 @@
         android:layout_height="0dp"
         android:layout_weight="7"
         android:id="@+id/weather2_image"
-        android:background="@drawable/rain"
+        android:background="@drawable/beau_2"
         />
     <TextView
         android:layout_width="match_parent"
