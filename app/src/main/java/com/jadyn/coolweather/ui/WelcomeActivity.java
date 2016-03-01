@@ -38,7 +38,7 @@ public class WelcomeActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            Intent intent = new Intent(WelcomeActivity.this, ChooseAreaActivity.class);
+            Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
             WelcomeActivity.this.startActivity(intent);
             //欢迎界面动画效果，淡入淡出
             overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);

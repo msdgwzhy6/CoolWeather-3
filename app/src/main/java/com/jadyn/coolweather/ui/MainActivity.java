@@ -1,5 +1,6 @@
 package com.jadyn.coolweather.ui;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,6 +21,7 @@ import com.jadyn.coolweather.common.CoolDate;
 import com.jadyn.coolweather.common.CoolLog;
 import com.jadyn.coolweather.model.Weather;
 import com.jadyn.coolweather.ui.adapter.WeatherListAdapter;
+import com.jadyn.coolweather.utils.WeatherTextUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,6 +55,9 @@ public class MainActivity extends AppCompatActivity implements
 
     private View topbar;
 
+    private ImageView topMenu;
+
+    private ProgressDialog dialog;
 
     private List<Weather> data;
     private WeatherListAdapter listAdapter;
@@ -70,16 +76,16 @@ public class MainActivity extends AppCompatActivity implements
 
         Intent intent = getIntent();
         String name = intent.getStringExtra(CITY_NAME);
-        getCityName(name);
-
+        if (name != null)
+            getCityName(name);
+        else
+            cityName = "深圳";
         initView();
-
-        data = new ArrayList<>();//listview数据源
 
         WeatherAsynTask asynTask = new WeatherAsynTask();
         asynTask.execute();
 
-        initList();
+        
     }
 
     //初始化DrawerLayout以及一些控件
@@ -87,13 +93,21 @@ public class MainActivity extends AppCompatActivity implements
         drawerLayout = (DrawerLayout) findViewById(R.id.main_drawer);
         topbar = findViewById(R.id.main_top);
         TextView topTitle = (TextView) topbar.findViewById(R.id.topbar_text);
+        topMenu = (ImageView) topbar.findViewById(R.id.topbar_menu_image);
+        
         topTitle.setText(cityName);
+        topMenu.setOnClickListener(new View.OnClickListener() {//点击打开菜单
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(Gravity.LEFT);
+            }
+        });
 
-        CoolLog.i("Time",CoolDate.YEAR+""+CoolDate.MONTH+""+CoolDate.HOUR+"");
+        CoolLog.i("Time", CoolDate.YEAR + "" + CoolDate.MONTH + "" + CoolDate.HOUR + "");
         if (CoolDate.HOUR > 6 && CoolDate.HOUR < 18) {
-            mainImage.setImageResource(R.drawable.sunrise);
+            mainImage.setBackgroundResource(R.drawable.sunrise);
         } else {
-            mainImage.setImageResource(R.drawable.sunset);
+            mainImage.setBackgroundResource(R.drawable.sunset);
         }
     }
 
@@ -105,11 +119,15 @@ public class MainActivity extends AppCompatActivity implements
             cityName = name.replace("市", "");
         }
     }
+
     //初始化ListView
     private void initList() {
+        closeProgress();
         listAdapter = new WeatherListAdapter(MainActivity.this, data,
                 R.layout.item_list_weather);
         mainList.setAdapter(listAdapter);
+
+        mainNavi.setNavigationItemSelectedListener(this);
     }
 
     @Override
@@ -128,6 +146,8 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            data = new ArrayList<>();//listview数据源
+            shouProgress();
         }
 
         @Override
@@ -157,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements
                     in.close();
                     conn.disconnect();
                 } else {
-                    Toast.makeText(MainActivity.this, "抱歉！我的小主，暂时无法从服务器获得数据", 
+                    Toast.makeText(MainActivity.this, "抱歉！我的小主，暂时无法从服务器获得数据",
                             Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception e) {
@@ -180,6 +200,8 @@ public class MainActivity extends AppCompatActivity implements
                     Weather weather = null;
                     for (int i = 0; i < jsonArray.length(); i++) {
                         String msgWea = jsonArray.getJSONObject(i) + "";
+                        msgWea=WeatherTextUtils.processText(msgWea);
+                        CoolLog.i("MainActivity1", msgWea);
                         if (msgWea.contains("晴")) {
                             weather = new Weather(msgWea, R.drawable.sunshine);
                         } else if (msgWea.contains("多云")) {
@@ -187,15 +209,32 @@ public class MainActivity extends AppCompatActivity implements
                         }
                         data.add(weather);
                     }
+                    initList();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             } else {
-                Toast.makeText(MainActivity.this, "无网络连接，并不能获取数据，请您联网吧！", 
+                Toast.makeText(MainActivity.this, "无网络连接，并不能获取数据，请您联网吧！",
                         Toast.LENGTH_LONG).show();
             }
+           
         }
 
+    }
+
+    public void shouProgress() {
+        if (dialog==null) {
+            dialog = new ProgressDialog(this);
+            dialog.setMessage("小主稍后，通通正在努力加载中……");
+            dialog.setCanceledOnTouchOutside(false);
+        }
+        dialog.show();
+    }
+
+    public void closeProgress() {
+        if (dialog!=null) {
+            dialog.dismiss();
+        }
     }
 
 }

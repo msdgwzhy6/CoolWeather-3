@@ -74,7 +74,9 @@ public class ChooseAreaActivity extends BaseActivity {
     private ExpandableListView expandableListView;//扩展列表
 
     private CityExpandAdapter expandAdapter;//扩展适配器
-    
+
+    private boolean isOpenAgain;
+
     /*
     * ========屏幕长宽============
     * */
@@ -107,22 +109,23 @@ public class ChooseAreaActivity extends BaseActivity {
         * 系统时间，根据月份设置背景
         * */
         month = CoolDate.MONTH;//获得系统当前月份
-        CoolLog.d("calendar",month+"");
+        CoolLog.d("calendar", month + "");
         setListBack(chooseList);
 
         weaDB = new CoolWeaDB(this);
         initDataProvince();//初始化省级数据
         initProvinceList();
     }
+
     //设置背景根据月份
     private void setListBack(ListView chooseList) {
-        if (month>=2&&month<5) {
+        if (month >= 2 && month < 5) {
             chooseList.setBackgroundResource(R.drawable.spring);//春
-        } else if (month>=5&&month<8) {
+        } else if (month >= 5 && month < 8) {
             chooseList.setBackgroundResource(R.drawable.summer);//夏
-        } else if (month>=8&&month<11) {
+        } else if (month >= 8 && month < 11) {
             chooseList.setBackgroundResource(R.drawable.autumn);//秋
-        } else if (month>=11&&month<2) {
+        } else if (month >= 11 && month < 2) {
             chooseList.setBackgroundResource(R.drawable.winter_2);//冬
         }
     }
@@ -160,11 +163,11 @@ public class ChooseAreaActivity extends BaseActivity {
         expandableListView = (ExpandableListView) view.findViewById(R.id.list_city_expand);
 
         //四个参数含义，加载的布局、长度、宽度、是否获得焦点
-        popupWindow = new PopupWindow(view, width/2,
-                height*2/3, true);
+        popupWindow = new PopupWindow(view, width / 2,
+                height * 2 / 3, true);
 
         popupWindow.setAnimationStyle(android.R.anim.slide_in_left);
-        
+
         popupWindow.setTouchable(true);
         popupWindow.setTouchInterceptor(new View.OnTouchListener() {
             @Override
@@ -180,7 +183,7 @@ public class ChooseAreaActivity extends BaseActivity {
 
         //设置悬浮窗显示的位置，参数一次是参照View，x轴偏移量，y轴的偏移量
         //以参照view为参照物，相对于Anchor锚的偏移
-        popupWindow.showAsDropDown(chooseTitle,-(width/5),height/5,Gravity.CENTER);
+        popupWindow.showAsDropDown(chooseTitle, -(width / 5), height / 5, Gravity.CENTER);
 
         //通过省集合的省ID和省code得到城市集合的数据和相应县城集合的数据
         initExpandData(ProID, expandableListView);
@@ -196,7 +199,11 @@ public class ChooseAreaActivity extends BaseActivity {
                 String cityName = cities.get(groupPosition).cityName;
                 chooseTitle.setText(cityName);
                 //打开对话框，是否继续向下查看
-                showAlertDialog(cityName);
+                if (!isOpenAgain) {//对话框只会打开一次
+                    showAlertDialog(cityName);
+                    isOpenAgain = true;
+                }
+                
                 return false;
             }
         });
@@ -207,15 +214,17 @@ public class ChooseAreaActivity extends BaseActivity {
                 String countryName = countriesExpand.get(groupPosition).get(childPosition).countryName;
                 chooseTitle.setText(countryName);
                 popupWindow.dismiss();
-                
+
                 Intent intent = new Intent(ChooseAreaActivity.this, MainActivity.class);
                 intent.putExtra(CITY_NAME, countryName);
                 startActivity(intent);
+                
+                finish();
                 return false;
             }
         });
-        
-        
+
+
     }
 
 
@@ -266,11 +275,12 @@ public class ChooseAreaActivity extends BaseActivity {
                 intent.putExtra(CITY_NAME, cityName);
                 startActivity(intent);
                 popupWindow.dismiss();
+                finish();
             }
         });
 
         builder.setNegativeButton("继续看看", null);
         builder.show();
     }
-   
+
 }

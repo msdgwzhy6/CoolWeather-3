@@ -4,6 +4,15 @@
     android:layout_height="match_parent"
     android:background="@drawable/main_title_bg"
     >
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/topbar_menu_image"
+        android:src="@drawable/ic_menu_moreoverflow"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
+        />
 
     <TextView
         android:id="@+id/topbar_text"
@@ -13,7 +22,7 @@
         android:textSize="30sp"
         android:textColor="#ffffff"
         android:gravity="center_vertical"
-        android:textStyle="bold|italic"
+        android:textStyle="bold"
         android:layout_centerInParent="true"
         />
 </RelativeLayout>

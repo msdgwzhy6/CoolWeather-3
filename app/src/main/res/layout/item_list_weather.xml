@@ -9,16 +9,16 @@
         android:layout_height="0dp"
         android:layout_weight="7"
         android:id="@+id/item_list_weather_image"
-        android:src="@drawable/cloudy"
         />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="3"
         android:textSize="30sp"
+        android:gravity="center_horizontal"
         android:textStyle="bold|italic"
         android:textColor="#ffffff"
-        android:background="@drawable/gray_bg"
+        android:background="@drawable/bg_wea_text"
         android:id="@+id/item_list_weather_text"
         />
         
