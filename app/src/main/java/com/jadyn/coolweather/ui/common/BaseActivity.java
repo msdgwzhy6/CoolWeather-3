@@ -1,4 +1,4 @@
-package com.jadyn.coolweather.activity.common;
+package com.jadyn.coolweather.ui.common;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

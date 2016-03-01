@@ -1,4 +1,4 @@
-package com.jadyn.coolweather.activity.adapter;
+package com.jadyn.coolweather.ui.adapter;
 
 import android.content.Context;
 import android.widget.TextView;

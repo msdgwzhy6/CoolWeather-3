@@ -1,4 +1,4 @@
-package com.jadyn.coolweather.activity.adapter;
+package com.jadyn.coolweather.ui.adapter;
 
 import android.support.v4.view.PagerAdapter;
 import android.view.View;

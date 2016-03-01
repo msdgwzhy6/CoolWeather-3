@@ -1,4 +1,4 @@
-package com.jadyn.coolweather.activity;
+package com.jadyn.coolweather.ui;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -18,17 +18,17 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.jadyn.coolweather.R;
-import com.jadyn.coolweather.activity.adapter.CityExpandAdapter;
-import com.jadyn.coolweather.activity.adapter.ProvinceAdapter;
-import com.jadyn.coolweather.activity.common.BaseActivity;
+import com.jadyn.coolweather.common.CoolDate;
 import com.jadyn.coolweather.common.CoolLog;
 import com.jadyn.coolweather.database.CoolWeaDB;
 import com.jadyn.coolweather.model.City;
 import com.jadyn.coolweather.model.Country;
 import com.jadyn.coolweather.model.Province;
+import com.jadyn.coolweather.ui.adapter.CityExpandAdapter;
+import com.jadyn.coolweather.ui.adapter.ProvinceAdapter;
+import com.jadyn.coolweather.ui.common.BaseActivity;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import butterknife.Bind;
@@ -86,7 +86,6 @@ public class ChooseAreaActivity extends BaseActivity {
     * =========系统时间===========
     * */
 
-    public Calendar calendar;
     private int month;
 
     @Override
@@ -107,8 +106,7 @@ public class ChooseAreaActivity extends BaseActivity {
         /*
         * 系统时间，根据月份设置背景
         * */
-        calendar = Calendar.getInstance();
-        month = calendar.get(Calendar.MONTH)+1;//获得系统当前月份
+        month = CoolDate.MONTH;//获得系统当前月份
         CoolLog.d("calendar",month+"");
         setListBack(chooseList);
 
@@ -275,5 +273,4 @@ public class ChooseAreaActivity extends BaseActivity {
         builder.show();
     }
    
-
 }

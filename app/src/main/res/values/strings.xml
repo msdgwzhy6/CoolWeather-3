@@ -20,4 +20,7 @@
     <!--天气接口-->
     <string name="weather_url">http://wthrcdn.etouch.cn/weather_mini?city</string>
 
+	<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

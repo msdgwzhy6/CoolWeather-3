@@ -1,4 +1,4 @@
-package com.jadyn.coolweather.activity;
+package com.jadyn.coolweather.ui;
 
 import android.content.Intent;
 import android.os.Bundle;

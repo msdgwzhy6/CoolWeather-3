@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/main_title_bg"
+    >
+
+    <TextView
+        android:id="@+id/topbar_text"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:text="天气情况"
+        android:textSize="30sp"
+        android:textColor="#ffffff"
+        android:gravity="center_vertical"
+        android:textStyle="bold|italic"
+        android:layout_centerInParent="true"
+        />
+</RelativeLayout>
