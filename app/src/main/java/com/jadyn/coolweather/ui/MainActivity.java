@@ -6,19 +6,23 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.jadyn.coolweather.R;
 import com.jadyn.coolweather.common.CoolDate;
 import com.jadyn.coolweather.common.CoolLog;
@@ -48,8 +52,6 @@ public class MainActivity extends AppCompatActivity implements
 
     public static final String CITY_NAME = "cityName";
 
-    DrawerLayout drawerLayout;
-
     @Bind(R.id.main_image)
     ImageView mainImage;
     @Bind(R.id.main_list)
@@ -59,9 +61,16 @@ public class MainActivity extends AppCompatActivity implements
     @Bind(R.id.main_fab)
     FloatingActionButton mainFab;
 
-    private View topbar;
+    
+    @Bind(R.id.main_appbar)
+    AppBarLayout mainAppbar;
 
-    private ImageView topMenu;
+    @Bind(R.id.main_drawer)
+    DrawerLayout mainDrawer;
+    @Bind(R.id.main_coorddinatorLayout)
+    CoordinatorLayout mainCoorddinatorLayout;
+    Toolbar mainTooBar;
+
 
     private ProgressDialog dialog;
 
@@ -71,9 +80,6 @@ public class MainActivity extends AppCompatActivity implements
     private String path;//路径
 
     private String name = "深圳";
-    ;
-    private TextView topTitle;
-
 
     private Setting setting;
 
@@ -82,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        mainTooBar = (Toolbar) findViewById(R.id.main_toolbar);
 
         path = getResources().getString(R.string.weather_url);
 
@@ -92,32 +100,25 @@ public class MainActivity extends AppCompatActivity implements
         getWeaFromUrl(name);
     }
 
-    
-    
+
     private void getWeaFromUrl(String cityOfName) {
         WeatherAsynTask asynTask = new WeatherAsynTask();
         asynTask.execute(cityOfName);
     }
 
-    
-    
+
     //初始化DrawerLayout以及一些控件
     private void initView() {
-        drawerLayout = (DrawerLayout) findViewById(R.id.main_drawer);
-        topbar = findViewById(R.id.main_top);
-        topTitle = (TextView) topbar.findViewById(R.id.topbar_text);
-        topMenu = (ImageView) topbar.findViewById(R.id.topbar_menu_image);
+        mainTooBar.setTitle("");
+        setSupportActionBar(mainTooBar);
 
-        topTitle.setText(name);
-        topMenu.setOnClickListener(new View.OnClickListener() {//点击打开菜单
-            @Override
-            public void onClick(View v) {
-                drawerLayout.openDrawer(Gravity.LEFT);
-            }
-        });
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, mainDrawer, mainTooBar,
+                R.string.drawer_open, R.string.drawer_close);
+        drawerToggle.syncState();
+        mainDrawer.setDrawerListener(drawerToggle);
 
         mainNavi.setNavigationItemSelectedListener(this);//导航栏点击
-        
+
         mainFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -126,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements
                         .setPositiveButton("准了", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(MainActivity.this, "谢赏", 
+                                Toast.makeText(MainActivity.this, "谢赏",
                                         Toast.LENGTH_SHORT).show();
                             }
                         }).setNegativeButton("跪安吧", null).show();
@@ -134,16 +135,16 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         CoolLog.i("Time", CoolDate.YEAR + "" + CoolDate.MONTH + "" + CoolDate.HOUR + "");
-        
-        setting.putInt(Setting.CURRENT_HOUR,CoolDate.HOUR);
-        if (setting.getInt(Setting.CURRENT_HOUR,0)>18||setting.getInt(Setting.CURRENT_HOUR,0)<6) {
-            
+
+        setting.putInt(Setting.CURRENT_HOUR, CoolDate.HOUR);
+        if (setting.getInt(Setting.CURRENT_HOUR, 0) > 18 || setting.getInt(Setting.CURRENT_HOUR, 0) < 6) {
+            Glide.with(this).load(R.mipmap.sunset).diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(mainImage);
         }
-        
+
     }
 
-    
-    
+
     //初始化ListView,必须要从网络获取到值才会初始化此ListView
     private void initList() {
         closeProgress();
@@ -152,8 +153,7 @@ public class MainActivity extends AppCompatActivity implements
         mainList.setAdapter(listAdapter);
     }
 
-    
-    
+
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -162,12 +162,11 @@ public class MainActivity extends AppCompatActivity implements
                         ChooseAreaActivity.class), 1);
                 break;
         }
-        drawerLayout.closeDrawer(GravityCompat.START);
+        mainDrawer.closeDrawer(GravityCompat.START);
         return false;
     }
 
-    
-    
+
     //异步任务处理类
     class WeatherAsynTask extends AsyncTask<String, Integer, JSONArray> {
         @Override
@@ -252,8 +251,7 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    
-    
+
     public void shouProgress() {
         if (dialog == null) {
             dialog = new ProgressDialog(this);
@@ -263,14 +261,14 @@ public class MainActivity extends AppCompatActivity implements
         dialog.show();
     }
 
-    
+
     public void closeProgress() {
         if (dialog != null) {
             dialog.dismiss();
         }
     }
 
-    
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -278,11 +276,9 @@ public class MainActivity extends AppCompatActivity implements
         if (requestCode == 1 && resultCode == RESULT_OK) {
             String resultName = data.getStringExtra(CITY_NAME);
             CoolLog.i("MainActivity", resultName);
-            topTitle.setText(resultName);
             resultName = WeatherTextUtils.getCityName(resultName);
             CoolLog.i("MainActivity", resultName);
             getWeaFromUrl(resultName);
-
         }
     }
 }
