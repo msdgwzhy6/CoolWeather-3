@@ -6,10 +6,13 @@
     >
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="25dp"
         android:layout_centerInParent="true"
+        android:gravity="center"
         android:id="@+id/expand_item_city"
         android:textSize="20sp"
+        android:textColor="#ffffff"
+        android:background="@drawable/bgs_black_gray"
         />
 </RelativeLayout>

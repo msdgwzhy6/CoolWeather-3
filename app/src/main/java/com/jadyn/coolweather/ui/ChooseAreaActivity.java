@@ -82,6 +82,7 @@ public class ChooseAreaActivity extends BaseActivity {
     * */
     private int width;
     private int height;
+    private int chooseListWidth;
     
     
     /*
@@ -104,6 +105,8 @@ public class ChooseAreaActivity extends BaseActivity {
         display.getMetrics(metrics);
         width = metrics.widthPixels;
         height = metrics.heightPixels;
+
+        chooseListWidth = chooseList.getLayoutParams().width;
         
         /*
         * 系统时间，根据月份设置背景
@@ -163,7 +166,7 @@ public class ChooseAreaActivity extends BaseActivity {
         expandableListView = (ExpandableListView) view.findViewById(R.id.list_city_expand);
 
         //四个参数含义，加载的布局、长度、宽度、是否获得焦点
-        popupWindow = new PopupWindow(view, width / 2,
+        popupWindow = new PopupWindow(view, width * 2 / 3,
                 height * 2 / 3, true);
 
         popupWindow.setAnimationStyle(android.R.anim.slide_in_left);
@@ -183,7 +186,8 @@ public class ChooseAreaActivity extends BaseActivity {
 
         //设置悬浮窗显示的位置，参数一次是参照View，x轴偏移量，y轴的偏移量
         //以参照view为参照物，相对于Anchor锚的偏移
-        popupWindow.showAsDropDown(chooseTitle, -(width / 5), height / 5, Gravity.CENTER);
+        int xOff = width / 2;
+        popupWindow.showAtLocation(chooseList, Gravity.CENTER, 0, 0);
 
         //通过省集合的省ID和省code得到城市集合的数据和相应县城集合的数据
         initExpandData(ProID, expandableListView);
@@ -203,7 +207,7 @@ public class ChooseAreaActivity extends BaseActivity {
                     showAlertDialog(cityName);
                     isOpenAgain = true;
                 }
-                
+
                 return false;
             }
         });
@@ -213,12 +217,12 @@ public class ChooseAreaActivity extends BaseActivity {
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 String countryName = countriesExpand.get(groupPosition).get(childPosition).countryName;
                 chooseTitle.setText(countryName);
+
+                Intent intent = new Intent();
+                intent.putExtra(CITY_NAME, countryName);
+                setResult(RESULT_OK,intent);
                 popupWindow.dismiss();
 
-                Intent intent = new Intent(ChooseAreaActivity.this, MainActivity.class);
-                intent.putExtra(CITY_NAME, countryName);
-                startActivity(intent);
-                
                 finish();
                 return false;
             }
@@ -271,9 +275,9 @@ public class ChooseAreaActivity extends BaseActivity {
         builder.setPositiveButton("看此城", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(ChooseAreaActivity.this, MainActivity.class);
+                Intent intent = new Intent();
                 intent.putExtra(CITY_NAME, cityName);
-                startActivity(intent);
+                setResult(RESULT_OK,intent);
                 popupWindow.dismiss();
                 finish();
             }

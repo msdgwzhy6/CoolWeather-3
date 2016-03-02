@@ -1,12 +1,15 @@
 package com.jadyn.coolweather.ui;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -52,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements
     ListView mainList;
     @Bind(R.id.main_navi)
     NavigationView mainNavi;
+    @Bind(R.id.main_fab)
+    FloatingActionButton mainFab;
 
     private View topbar;
 
@@ -64,7 +69,9 @@ public class MainActivity extends AppCompatActivity implements
 
     private String path;//路径
 
-    private String cityName;
+    private String name = "深圳";
+    ;
+    private TextView topTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,32 +81,43 @@ public class MainActivity extends AppCompatActivity implements
 
         path = getResources().getString(R.string.weather_url);
 
-        Intent intent = getIntent();
-        String name = intent.getStringExtra(CITY_NAME);
-        if (name != null)
-            getCityName(name);
-        else
-            cityName = "深圳";
         initView();
 
-        WeatherAsynTask asynTask = new WeatherAsynTask();
-        asynTask.execute();
+        getWeaFromUrl(name);
+    }
 
-        
+    private void getWeaFromUrl(String cityOfName) {
+        WeatherAsynTask asynTask = new WeatherAsynTask();
+        asynTask.execute(cityOfName);
     }
 
     //初始化DrawerLayout以及一些控件
     private void initView() {
         drawerLayout = (DrawerLayout) findViewById(R.id.main_drawer);
         topbar = findViewById(R.id.main_top);
-        TextView topTitle = (TextView) topbar.findViewById(R.id.topbar_text);
+        topTitle = (TextView) topbar.findViewById(R.id.topbar_text);
         topMenu = (ImageView) topbar.findViewById(R.id.topbar_menu_image);
-        
-        topTitle.setText(cityName);
+
+        topTitle.setText(name);
         topMenu.setOnClickListener(new View.OnClickListener() {//点击打开菜单
             @Override
             public void onClick(View v) {
                 drawerLayout.openDrawer(Gravity.LEFT);
+            }
+        });
+        
+        mainFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(MainActivity.this).setTitle("鼓励一下")
+                        .setMessage("给作者点个赞吧，小主")
+                        .setPositiveButton("准了", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Toast.makeText(MainActivity.this, "谢赏", 
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }).setNegativeButton("跪安吧", null);
             }
         });
 
@@ -108,15 +126,6 @@ public class MainActivity extends AppCompatActivity implements
             mainImage.setBackgroundResource(R.drawable.sunrise);
         } else {
             mainImage.setBackgroundResource(R.drawable.sunset);
-        }
-    }
-
-    //得到城市名字
-    public void getCityName(String name) {
-        if (name.contains("市")) {
-            cityName = name.replace("市", "");
-        } else if (name.contains("县")) {
-            cityName = name.replace("市", "");
         }
     }
 
@@ -134,7 +143,8 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.navi_city:
-                startActivity(new Intent(MainActivity.this, ChooseAreaActivity.class));
+                startActivityForResult(new Intent(MainActivity.this,
+                        ChooseAreaActivity.class), 1);
                 break;
         }
         drawerLayout.closeDrawer(GravityCompat.START);
@@ -155,8 +165,10 @@ public class MainActivity extends AppCompatActivity implements
             URL url = null;
             JSONArray array = null;
             HttpURLConnection conn = null;
+            String address = params[0];
             try {
-                url = new URL(path + "=" + URLEncoder.encode(cityName, "utf-8"));
+                url = new URL(path + "=" + URLEncoder.encode(address, "utf-8"));
+                CoolLog.i("MainActivity", address);
                 conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setConnectTimeout(5000);
@@ -177,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements
                     in.close();
                     conn.disconnect();
                 } else {
-                    Toast.makeText(MainActivity.this, "抱歉！我的小主，暂时无法从服务器获得数据",
+                    Toast.makeText(MainActivity.this, "抱歉！我的小主，无网络暂时无法从服务器获得数据",
                             Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception e) {
@@ -194,14 +206,14 @@ public class MainActivity extends AppCompatActivity implements
             //设置今天、明天、后天的天气咨询文本内容
             if (jsonArray != null) {
                 try {
-                    CoolLog.i("MainActivity1", jsonArray.getJSONObject(0) + "");
-                    CoolLog.i("MainActivity1", jsonArray.getJSONObject(1) + "");
-                    CoolLog.i("MainActivity1", jsonArray.getJSONObject(2) + "");
+                    CoolLog.i("MainActivity", jsonArray.getJSONObject(0) + "");
+                    CoolLog.i("MainActivity", jsonArray.getJSONObject(1) + "");
+                    CoolLog.i("MainActivity", jsonArray.getJSONObject(2) + "");
                     Weather weather = null;
                     for (int i = 0; i < jsonArray.length(); i++) {
                         String msgWea = jsonArray.getJSONObject(i) + "";
-                        msgWea=WeatherTextUtils.processText(msgWea);
-                        CoolLog.i("MainActivity1", msgWea);
+                        msgWea = WeatherTextUtils.processText(msgWea);
+                        CoolLog.i("MainActivity", msgWea);
                         if (msgWea.contains("晴")) {
                             weather = new Weather(msgWea, R.drawable.sunshine);
                         } else if (msgWea.contains("多云")) {
@@ -214,16 +226,17 @@ public class MainActivity extends AppCompatActivity implements
                     e.printStackTrace();
                 }
             } else {
-                Toast.makeText(MainActivity.this, "无网络连接，并不能获取数据，请您联网吧！",
+                closeProgress();
+                Toast.makeText(MainActivity.this, "暂时没有此城市的数据，我们会尽快弥补！",
                         Toast.LENGTH_LONG).show();
             }
-           
+
         }
 
     }
 
     public void shouProgress() {
-        if (dialog==null) {
+        if (dialog == null) {
             dialog = new ProgressDialog(this);
             dialog.setMessage("小主稍后，通通正在努力加载中……");
             dialog.setCanceledOnTouchOutside(false);
@@ -232,11 +245,25 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void closeProgress() {
-        if (dialog!=null) {
+        if (dialog != null) {
             dialog.dismiss();
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            String resultName = data.getStringExtra(CITY_NAME);
+            CoolLog.i("MainActivity", resultName);
+            topTitle.setText(resultName);
+            resultName = WeatherTextUtils.getCityName(resultName);
+            CoolLog.i("MainActivity", resultName);
+            getWeaFromUrl(resultName);
+
+        }
+    }
 }
 
 //数据流处理类

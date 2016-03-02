@@ -26,6 +26,7 @@ public class WeatherListAdapter extends CommonAdapter<Weather>{
         TextView text = viewHolder.getView(R.id.item_list_weather_text);
         
         image.setBackgroundResource(weather.weaImg);
+        
         text.setText(weather.weaText);
     }
 }

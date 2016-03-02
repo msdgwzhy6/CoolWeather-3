@@ -17,7 +17,7 @@
         android:textSize="30sp"
         android:gravity="center_horizontal"
         android:textStyle="bold|italic"
-        android:textColor="#ffffff"
+        android:textColor="#000000"
         android:background="@drawable/bg_wea_text"
         android:id="@+id/item_list_weather_text"
         />

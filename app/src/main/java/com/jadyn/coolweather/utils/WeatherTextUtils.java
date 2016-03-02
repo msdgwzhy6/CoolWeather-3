@@ -21,4 +21,15 @@ public class WeatherTextUtils {
         }
         return newMsg;
     }
+
+    //处理得到的数据
+    public static String getCityName(String c) {
+        String cityName = "";
+        if (c.contains("市")) {
+            cityName = c.replace("市", "");
+        } else if (c.contains("县")) {
+            cityName = c.replace("市", "");
+        }
+        return cityName;
+    }
 }
