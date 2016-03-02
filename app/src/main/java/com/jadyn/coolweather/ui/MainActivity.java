@@ -1,5 +1,6 @@
 package com.jadyn.coolweather.ui;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,7 +10,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -91,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements
         asynTask.execute(cityOfName);
     }
 
+    
+    
     //初始化DrawerLayout以及一些控件
     private void initView() {
         drawerLayout = (DrawerLayout) findViewById(R.id.main_drawer);
@@ -105,6 +107,8 @@ public class MainActivity extends AppCompatActivity implements
                 drawerLayout.openDrawer(Gravity.LEFT);
             }
         });
+
+        mainNavi.setNavigationItemSelectedListener(this);//导航栏点击
         
         mainFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements
                                 Toast.makeText(MainActivity.this, "谢赏", 
                                         Toast.LENGTH_SHORT).show();
                             }
-                        }).setNegativeButton("跪安吧", null);
+                        }).setNegativeButton("跪安吧", null).show();
             }
         });
 
@@ -127,18 +131,21 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             mainImage.setBackgroundResource(R.drawable.sunset);
         }
+        
     }
 
-    //初始化ListView
+    
+    
+    //初始化ListView,必须要从网络获取到值才会初始化此ListView
     private void initList() {
         closeProgress();
         listAdapter = new WeatherListAdapter(MainActivity.this, data,
                 R.layout.item_list_weather);
         mainList.setAdapter(listAdapter);
-
-        mainNavi.setNavigationItemSelectedListener(this);
     }
 
+    
+    
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -151,6 +158,8 @@ public class MainActivity extends AppCompatActivity implements
         return false;
     }
 
+    
+    
     //异步任务处理类
     class WeatherAsynTask extends AsyncTask<String, Integer, JSONArray> {
         @Override
@@ -235,6 +244,8 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
+    
+    
     public void shouProgress() {
         if (dialog == null) {
             dialog = new ProgressDialog(this);
@@ -244,12 +255,14 @@ public class MainActivity extends AppCompatActivity implements
         dialog.show();
     }
 
+    
     public void closeProgress() {
         if (dialog != null) {
             dialog.dismiss();
         }
     }
 
+    
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

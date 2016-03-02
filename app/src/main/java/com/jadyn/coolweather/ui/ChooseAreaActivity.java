@@ -283,7 +283,12 @@ public class ChooseAreaActivity extends BaseActivity {
             }
         });
 
-        builder.setNegativeButton("继续看看", null);
+        builder.setNegativeButton("继续看看", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                isOpenAgain = false;//继续浏览县城将此值重置为false,确保重新选择城市时还会弹出对话框
+            }
+        });
         builder.show();
     }
 
