@@ -25,10 +25,10 @@ public class WeatherTextUtils {
     //处理得到的数据
     public static String getCityName(String c) {
         String cityName = "";
-        if (c.contains("市")) {
-            cityName = c.replace("市", "");
-        } else if (c.contains("县")) {
-            cityName = c.replace("市", "");
+        if (c!=null) {
+            cityName = c.replace("市", "")
+                    .replace("县", "")
+                    .replace("区", "").trim();
         }
         return cityName;
     }

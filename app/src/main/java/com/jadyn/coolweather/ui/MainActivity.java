@@ -24,6 +24,7 @@ import com.jadyn.coolweather.common.CoolDate;
 import com.jadyn.coolweather.common.CoolLog;
 import com.jadyn.coolweather.model.Weather;
 import com.jadyn.coolweather.ui.adapter.WeatherListAdapter;
+import com.jadyn.coolweather.ui.setting.Setting;
 import com.jadyn.coolweather.utils.WeatherTextUtils;
 
 import org.json.JSONArray;
@@ -73,6 +74,9 @@ public class MainActivity extends AppCompatActivity implements
     ;
     private TextView topTitle;
 
+
+    private Setting setting;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,11 +85,15 @@ public class MainActivity extends AppCompatActivity implements
 
         path = getResources().getString(R.string.weather_url);
 
+        setting = Setting.getsInstance(this);
+
         initView();
 
         getWeaFromUrl(name);
     }
 
+    
+    
     private void getWeaFromUrl(String cityOfName) {
         WeatherAsynTask asynTask = new WeatherAsynTask();
         asynTask.execute(cityOfName);
@@ -126,10 +134,10 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         CoolLog.i("Time", CoolDate.YEAR + "" + CoolDate.MONTH + "" + CoolDate.HOUR + "");
-        if (CoolDate.HOUR > 6 && CoolDate.HOUR < 18) {
-            mainImage.setBackgroundResource(R.drawable.sunrise);
-        } else {
-            mainImage.setBackgroundResource(R.drawable.sunset);
+        
+        setting.putInt(Setting.CURRENT_HOUR,CoolDate.HOUR);
+        if (setting.getInt(Setting.CURRENT_HOUR,0)>18||setting.getInt(Setting.CURRENT_HOUR,0)<6) {
+            
         }
         
     }
