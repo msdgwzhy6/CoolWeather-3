@@ -6,8 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,16 +17,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.jadyn.coolweather.R;
-import com.jadyn.coolweather.common.CoolDate;
 import com.jadyn.coolweather.common.CoolLog;
 import com.jadyn.coolweather.model.Weather;
 import com.jadyn.coolweather.ui.adapter.WeatherListAdapter;
-import com.jadyn.coolweather.ui.setting.Setting;
 import com.jadyn.coolweather.utils.WeatherTextUtils;
 
 import org.json.JSONArray;
@@ -42,6 +37,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.Bind;
@@ -61,15 +57,11 @@ public class MainActivity extends AppCompatActivity implements
     @Bind(R.id.main_fab)
     FloatingActionButton mainFab;
 
-    
-    @Bind(R.id.main_appbar)
-    AppBarLayout mainAppbar;
-
     @Bind(R.id.main_drawer)
     DrawerLayout mainDrawer;
-    @Bind(R.id.main_coorddinatorLayout)
-    CoordinatorLayout mainCoorddinatorLayout;
     Toolbar mainTooBar;
+    @Bind(R.id.toolbar_text)
+    TextView toolbarText;
 
 
     private ProgressDialog dialog;
@@ -81,8 +73,13 @@ public class MainActivity extends AppCompatActivity implements
 
     private String name = "深圳";
 
-    private Setting setting;
-
+    private Calendar calendar;
+    
+    
+    /*
+    * 定位
+    * */
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,8 +89,6 @@ public class MainActivity extends AppCompatActivity implements
         mainTooBar = (Toolbar) findViewById(R.id.main_toolbar);
 
         path = getResources().getString(R.string.weather_url);
-
-        setting = Setting.getsInstance(this);
 
         initView();
 
@@ -110,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements
     //初始化DrawerLayout以及一些控件
     private void initView() {
         mainTooBar.setTitle("");
+        toolbarText.setText(name);
         setSupportActionBar(mainTooBar);
 
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, mainDrawer, mainTooBar,
@@ -133,17 +129,23 @@ public class MainActivity extends AppCompatActivity implements
                         }).setNegativeButton("跪安吧", null).show();
             }
         });
-
-        CoolLog.i("Time", CoolDate.YEAR + "" + CoolDate.MONTH + "" + CoolDate.HOUR + "");
-
-        setting.putInt(Setting.CURRENT_HOUR, CoolDate.HOUR);
-        if (setting.getInt(Setting.CURRENT_HOUR, 0) > 18 || setting.getInt(Setting.CURRENT_HOUR, 0) < 6) {
-            Glide.with(this).load(R.mipmap.sunset).diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(mainImage);
-        }
+        
+        mainImage.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                calendar = Calendar.getInstance();
+                int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                CoolLog.e("Time",hour+"");
+                if (hour > 18 || hour < 6) {
+                    mainImage.setBackgroundResource(R.drawable.sunset);
+                } else {
+                    mainImage.setBackgroundResource(R.drawable.sunrise);
+                }
+            }
+        },1000);
 
     }
-
+    
 
     //初始化ListView,必须要从网络获取到值才会初始化此ListView
     private void initList() {
@@ -278,8 +280,17 @@ public class MainActivity extends AppCompatActivity implements
             CoolLog.i("MainActivity", resultName);
             resultName = WeatherTextUtils.getCityName(resultName);
             CoolLog.i("MainActivity", resultName);
+            toolbarText.setText(resultName);
             getWeaFromUrl(resultName);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (calendar!=null) {
+            calendar = null;
+        }
+        super.onDestroy();
     }
 }
 

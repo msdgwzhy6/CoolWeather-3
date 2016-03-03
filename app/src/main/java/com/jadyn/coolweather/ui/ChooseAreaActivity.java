@@ -11,6 +11,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
@@ -18,8 +19,6 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.jadyn.coolweather.R;
-import com.jadyn.coolweather.common.CoolDate;
-import com.jadyn.coolweather.common.CoolLog;
 import com.jadyn.coolweather.database.CoolWeaDB;
 import com.jadyn.coolweather.model.City;
 import com.jadyn.coolweather.model.Country;
@@ -84,16 +83,11 @@ public class ChooseAreaActivity extends BaseActivity {
     private int height;
     private int chooseListWidth;
     
-    
-    /*
-    * =========系统时间===========
-    * */
-
-    private int month;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_choose_area);
         ButterKnife.bind(this);
 
@@ -107,30 +101,10 @@ public class ChooseAreaActivity extends BaseActivity {
         height = metrics.heightPixels;
 
         chooseListWidth = chooseList.getLayoutParams().width;
-        
-        /*
-        * 系统时间，根据月份设置背景
-        * */
-        month = CoolDate.MONTH;//获得系统当前月份
-        CoolLog.d("calendar", month + "");
-        setListBack(chooseList);
 
         weaDB = new CoolWeaDB(this);
         initDataProvince();//初始化省级数据
         initProvinceList();
-    }
-
-    //设置背景根据月份
-    private void setListBack(ListView chooseList) {
-        if (month >= 2 && month < 5) {
-            chooseList.setBackgroundResource(R.drawable.spring);//春
-        } else if (month >= 5 && month < 8) {
-            chooseList.setBackgroundResource(R.drawable.summer);//夏
-        } else if (month >= 8 && month < 11) {
-            chooseList.setBackgroundResource(R.drawable.autumn);//秋
-        } else if (month >= 11 && month < 2) {
-            chooseList.setBackgroundResource(R.drawable.winter_2);//冬
-        }
     }
 
     /*

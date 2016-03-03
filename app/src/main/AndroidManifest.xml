@@ -22,7 +22,7 @@
         </activity>
         <activity
             android:name=".ui.MainActivity"
-            android:theme="@style/AppTheme.transpant" />
+            android:theme="@style/AppTheme.Base" />
         <activity android:name=".ui.ChooseAreaActivity"
             android:theme="@style/NoTitle"
             ></activity>

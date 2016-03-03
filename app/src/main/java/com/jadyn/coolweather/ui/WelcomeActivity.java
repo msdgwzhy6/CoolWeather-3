@@ -31,7 +31,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
     @OnClick(R.id.welcome_image)
     public void onClick() {
-        welcomeImage.setImageResource(R.drawable.welcome_feather);
+        welcomeImage.setBackgroundResource(R.drawable.welcome_feather);
     }
 
     class SwitchHandler extends Handler {

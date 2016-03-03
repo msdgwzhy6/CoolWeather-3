@@ -8,8 +8,8 @@ import android.content.SharedPreferences;
  * 设置类
  */
 public class Setting {
-    public static final String CURRENT_HOUR = "小时";//当前时辰
-
+    public static final String CITY_NAME="城市名";
+    
     private static Setting sInstance;
     
     private SharedPreferences spf;
@@ -38,5 +38,16 @@ public class Setting {
 
     public int getInt(String key, int defValue) {
         return spf.getInt(key, defValue);
+    }
+
+
+    public Setting putString(String key, String value) {
+        spf.edit().putString(key, value).apply();
+        return this;
+    }
+    
+
+    public String getString(String key, String defValue) {
+        return spf.getString(key, defValue);
     }
 }
