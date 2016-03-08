@@ -10,5 +10,6 @@
         android:layout_height="match_parent"
         android:id="@+id/welcome_image"
         android:background="@drawable/weclome_pencel"
+        android:onClick="click"
         />
 </FrameLayout>

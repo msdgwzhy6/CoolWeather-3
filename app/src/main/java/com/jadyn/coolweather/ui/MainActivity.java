@@ -1,10 +1,10 @@
 package com.jadyn.coolweather.ui;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -15,30 +15,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jadyn.coolweather.R;
 import com.jadyn.coolweather.common.CoolLog;
-import com.jadyn.coolweather.model.Weather;
-import com.jadyn.coolweather.ui.adapter.WeatherListAdapter;
+import com.jadyn.coolweather.ui.fragment.ContentFragment;
 import com.jadyn.coolweather.utils.WeatherTextUtils;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -47,11 +34,10 @@ public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener {
 
     public static final String CITY_NAME = "cityName";
+    private static final String KEY = "city";
 
     @Bind(R.id.main_image)
     ImageView mainImage;
-    @Bind(R.id.main_list)
-    ListView mainList;
     @Bind(R.id.main_navi)
     NavigationView mainNavi;
     @Bind(R.id.main_fab)
@@ -62,24 +48,19 @@ public class MainActivity extends AppCompatActivity implements
     Toolbar mainTooBar;
     @Bind(R.id.toolbar_text)
     TextView toolbarText;
-
-
-    private ProgressDialog dialog;
-
-    private List<Weather> data;
-    private WeatherListAdapter listAdapter;
-
-    private String path;//路径
+    @Bind(R.id.main_frame)
+    FrameLayout mainFrame;
 
     private String name = "深圳";
 
     private Calendar calendar;
+
+    private ContentFragment contentFragment;
     
+    FragmentManager fragmentManager;
     
-    /*
-    * 定位
-    * */
-    
+    private FragmentTransaction transaction;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,19 +69,21 @@ public class MainActivity extends AppCompatActivity implements
 
         mainTooBar = (Toolbar) findViewById(R.id.main_toolbar);
 
-        path = getResources().getString(R.string.weather_url);
-
         initView();
-
-        getWeaFromUrl(name);
     }
 
 
-    private void getWeaFromUrl(String cityOfName) {
-        WeatherAsynTask asynTask = new WeatherAsynTask();
-        asynTask.execute(cityOfName);
-    }
+    /*在resume方法内添加fragment*/
+    @Override
+    protected void onResume() {
+        ContentFragment fragment = new ContentFragment();
+        fragmentManager = getFragmentManager();
+        transaction = fragmentManager.beginTransaction();
 
+        transaction.replace(R.id.main_frame, fragment).commit();
+        super.onResume();
+    }
+    
 
     //初始化DrawerLayout以及一些控件
     private void initView() {
@@ -129,30 +112,21 @@ public class MainActivity extends AppCompatActivity implements
                         }).setNegativeButton("跪安吧", null).show();
             }
         });
-        
+
         mainImage.postDelayed(new Runnable() {
             @Override
             public void run() {
                 calendar = Calendar.getInstance();
                 int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                CoolLog.e("Time",hour+"");
+                CoolLog.e("Time", hour + "");
                 if (hour > 18 || hour < 6) {
                     mainImage.setBackgroundResource(R.drawable.sunset);
                 } else {
                     mainImage.setBackgroundResource(R.drawable.sunrise);
                 }
             }
-        },1000);
+        }, 1000);
 
-    }
-    
-
-    //初始化ListView,必须要从网络获取到值才会初始化此ListView
-    private void initList() {
-        closeProgress();
-        listAdapter = new WeatherListAdapter(MainActivity.this, data,
-                R.layout.item_list_weather);
-        mainList.setAdapter(listAdapter);
     }
 
 
@@ -169,150 +143,39 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    //异步任务处理类
-    class WeatherAsynTask extends AsyncTask<String, Integer, JSONArray> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            data = new ArrayList<>();//listview数据源
-            shouProgress();
-        }
-
-        @Override
-        protected JSONArray doInBackground(String... params) {
-            URL url = null;
-            JSONArray array = null;
-            HttpURLConnection conn = null;
-            String address = params[0];
-            try {
-                url = new URL(path + "=" + URLEncoder.encode(address, "utf-8"));
-                CoolLog.i("MainActivity", address);
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setConnectTimeout(5000);
-
-                int code = conn.getResponseCode();
-
-                if (code == 200) {
-                    InputStream in = conn.getInputStream();
-                    String jsonData = StreamTool.decodeStream(in);
-
-                    JSONObject jsonObje = new JSONObject(jsonData);
-
-                    String desc = jsonObje.getString("desc");
-                    if ("OK".equals(desc)) {
-                        JSONObject dataObj = jsonObje.getJSONObject("data");
-                        array = dataObj.getJSONArray("forecast");
-                    }
-                    in.close();
-                    conn.disconnect();
-                } else {
-                    Toast.makeText(MainActivity.this, "抱歉！我的小主，无网络暂时无法从服务器获得数据",
-                            Toast.LENGTH_SHORT).show();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return array;
-        }
-
-        @Override
-        protected void onPostExecute(JSONArray jsonArray) {
-            super.onPostExecute(jsonArray);
-
-            //设置今天、明天、后天的天气咨询文本内容
-            if (jsonArray != null) {
-                try {
-                    CoolLog.i("MainActivity", jsonArray.getJSONObject(0) + "");
-                    CoolLog.i("MainActivity", jsonArray.getJSONObject(1) + "");
-                    CoolLog.i("MainActivity", jsonArray.getJSONObject(2) + "");
-                    Weather weather = null;
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        String msgWea = jsonArray.getJSONObject(i) + "";
-                        msgWea = WeatherTextUtils.processText(msgWea);
-                        CoolLog.i("MainActivity", msgWea);
-                        if (msgWea.contains("晴")) {
-                            weather = new Weather(msgWea, R.drawable.sunshine);
-                        } else if (msgWea.contains("多云")) {
-                            weather = new Weather(msgWea, R.drawable.cloudy);
-                        }
-                        data.add(weather);
-                    }
-                    initList();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                closeProgress();
-                Toast.makeText(MainActivity.this, "暂时没有此城市的数据，我们会尽快弥补！",
-                        Toast.LENGTH_LONG).show();
-            }
-
-        }
-
-    }
-
-
-    public void shouProgress() {
-        if (dialog == null) {
-            dialog = new ProgressDialog(this);
-            dialog.setMessage("小主稍后，通通正在努力加载中……");
-            dialog.setCanceledOnTouchOutside(false);
-        }
-        dialog.show();
-    }
-
-
-    public void closeProgress() {
-        if (dialog != null) {
-            dialog.dismiss();
-        }
-    }
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 1 && resultCode == RESULT_OK) {
             String resultName = data.getStringExtra(CITY_NAME);
+            
             CoolLog.i("MainActivity", resultName);
+            
             resultName = WeatherTextUtils.getCityName(resultName);
+            
             CoolLog.i("MainActivity", resultName);
             toolbarText.setText(resultName);
-            getWeaFromUrl(resultName);
+
+            /*一旦从选择城市中得到数据，就重写new一个FragmentTransaction，再次提交*/
+            Bundle bundle = new Bundle();
+            ContentFragment contentFragment = new ContentFragment();
+            bundle.getString(KEY, resultName);
+            contentFragment.setArguments(bundle);
+            
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.main_frame, contentFragment).commit();
         }
     }
+    
 
     @Override
     protected void onDestroy() {
-        if (calendar!=null) {
+        if (calendar != null) {
             calendar = null;
         }
         super.onDestroy();
     }
 }
 
-//数据流处理类
-class StreamTool {
 
-    //解析 流的数据,返回字符串 
-    public static String decodeStream(InputStream in) throws IOException {
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        int len = 0;
-        byte[] buf = new byte[1024];
-        while ((len = in.read(buf)) > 0) {
-            baos.write(buf, 0, len);
-        }
-
-        in.close();
-        baos.close();
-
-        return baos.toString();
-    }
-
-
-}
